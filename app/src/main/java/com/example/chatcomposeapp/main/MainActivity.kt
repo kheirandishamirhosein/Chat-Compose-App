@@ -1,4 +1,4 @@
-package com.example.chatcomposeapp
+package com.example.chatcomposeapp.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
