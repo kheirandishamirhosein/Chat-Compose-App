@@ -4,11 +4,13 @@ import com.example.chatcomposeapp.data.remote.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class FirebaseService {
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+class FirebaseService @Inject constructor(
+    private val auth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
+) {
 
     suspend fun getUser(userId: String): User? {
         val document = firestore.collection("users").document(userId).get().await()
