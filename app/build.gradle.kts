@@ -79,9 +79,16 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1")
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.50")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
     kapt("com.google.dagger:hilt-android-compiler:2.50")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
-
+    //Navigation
+    implementation ("androidx.navigation:navigation-compose:2.7.7")
+    //Animation
+    implementation("androidx.compose.animation:animation-core:1.4.3")
+    //Material 3
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.material3:material3:1.2.0-rc01")
+    implementation("androidx.compose.material:material:1.0.0")
 }
 
 kapt {
