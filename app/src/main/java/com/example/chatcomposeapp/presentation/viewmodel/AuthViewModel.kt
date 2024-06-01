@@ -1,5 +1,6 @@
 package com.example.chatcomposeapp.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatcomposeapp.data.remote.firebase.FirebaseService
@@ -32,6 +33,7 @@ class AuthViewModel @Inject constructor(
                         } else {
                             _authState.value =
                                 FirebaseAuthState.Error(task.exception?.message ?: "Unknown error")
+                            Log.e("Sing In Error", task.exception?.message.toString())
                         }
 
                     }
@@ -49,6 +51,7 @@ class AuthViewModel @Inject constructor(
                 _authState.value = FirebaseAuthState.Success
             } catch (ex: Exception) {
                 _authState.value = FirebaseAuthState.Error(ex.message ?: "Unknown error")
+                Log.e("Create user Error", ex.message.toString())
             }
         }
     }
