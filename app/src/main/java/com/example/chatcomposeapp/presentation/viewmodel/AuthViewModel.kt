@@ -29,20 +29,61 @@ class AuthViewModel @Inject constructor(
                 firebaseAuth.signInWithEmailAndPassword(user.email, user.password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
+                            Log.d("AuthViewModel", "Sign in successful")
                             _authState.value = FirebaseAuthState.Success
                         } else {
-                            _authState.value =
-                                FirebaseAuthState.Error(task.exception?.message ?: "Unknown error")
-                            Log.e("Sing In Error", task.exception?.message.toString())
+                            Log.e("AuthViewModel", "Sign in failed: ${task.exception?.message}")
+                            _authState.value = FirebaseAuthState.Error(task.exception?.message ?: "Unknown error")
                         }
-
                     }
             } catch (ex: Exception) {
+                Log.e("AuthViewModel", "Sign in exception: ${ex.message}")
                 _authState.value = FirebaseAuthState.Error(ex.message ?: "Unknown error")
             }
         }
     }
 
+
+    fun createUser(user: User) {
+        viewModelScope.launch {
+            _authState.value = FirebaseAuthState.Loading
+            try {
+                firebaseAuth.createUserWithEmailAndPassword(user.email, user.password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val newUser = task.result?.user
+                            if (newUser != null) {
+                                Log.d("AuthViewModel", "User created successfully with UID: ${newUser.uid}")
+                                viewModelScope.launch {
+                                    try {
+                                        firebaseService.createUser(user.copy(id = newUser.uid))
+                                        Log.d("AuthViewModel", "User data added to Firestore")
+                                        _authState.value = FirebaseAuthState.Success
+                                    } catch (e: Exception) {
+                                        Log.e("AuthViewModel", "Error adding user data to Firestore: ${e.message}")
+                                        _authState.value = FirebaseAuthState.Error(e.message ?: "Unknown error")
+                                    }
+                                }
+                            } else {
+                                Log.e("AuthViewModel", "User creation failed: no user info returned")
+                                _authState.value = FirebaseAuthState.Error("User creation failed: no user info returned")
+                            }
+                        } else {
+                            Log.e("AuthViewModel", "User creation failed: ${task.exception?.message}")
+                            if (task.exception != null) {
+                                Log.e("AuthViewModel", "Exception: ", task.exception)
+                            }
+                            _authState.value = FirebaseAuthState.Error(task.exception?.message ?: "Unknown error")
+                        }
+                    }
+            } catch (ex: Exception) {
+                Log.e("AuthViewModel", "User creation exception: ${ex.message}")
+                _authState.value = FirebaseAuthState.Error(ex.message ?: "Unknown error")
+            }
+        }
+    }
+
+     /*
     fun createUser(user: User) {
         viewModelScope.launch {
             _authState.value = FirebaseAuthState.Loading
@@ -56,21 +97,29 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+      */
+
+
+
     fun getUser(userId: String) {
         viewModelScope.launch {
             _authState.value = FirebaseAuthState.Loading
             try {
                 val user = firebaseService.getUser(userId)
                 if (user != null) {
+                    Log.d("AuthViewModel", "User loaded successfully")
                     _authState.value = FirebaseAuthState.UserLoaded(user)
                 } else {
+                    Log.e("AuthViewModel", "User not found")
                     _authState.value = FirebaseAuthState.Error("User not found")
                 }
             } catch (ex: Exception) {
+                Log.e("AuthViewModel", "Error loading user: ${ex.message}")
                 _authState.value = FirebaseAuthState.Error(ex.message ?: "Unknown error")
             }
         }
     }
+
 
 
 }

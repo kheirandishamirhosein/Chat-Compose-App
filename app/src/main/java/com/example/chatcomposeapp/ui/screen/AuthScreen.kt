@@ -1,10 +1,7 @@
 package com.example.chatcomposeapp.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,6 +41,7 @@ fun AuthScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var isSignUp by remember { mutableStateOf(false) }
 
     val scaffoldState = rememberScaffoldState()
@@ -78,7 +75,7 @@ fun AuthScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Show CircularProgressIndicator if loading
+
                 if (authState is FirebaseAuthState.Loading) {
                     CircularProgressIndicator()
                 }
@@ -91,6 +88,16 @@ fun AuthScreen(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                if (isSignUp) {
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("Username") },
+                        singleLine = true
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
                 OutlinedTextField(
                     value = email,
@@ -115,8 +122,8 @@ fun AuthScreen(
                         if (isSignUp) {
                             viewModel.createUser(
                                 User(
-                                    id = 0,
-                                    username = "",
+                                    id = "",
+                                    username = username,
                                     email = email,
                                     password = password
                                 )
@@ -124,7 +131,7 @@ fun AuthScreen(
                         } else {
                             viewModel.singIn(
                                 User(
-                                    id = 0,
+                                    id = "",
                                     username = "",
                                     email = email,
                                     password = password
